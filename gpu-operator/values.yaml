@@ -1,0 +1,81 @@
+# Default values for gpu-operator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+nfd:
+  enabled: true
+
+node-feature-discovery:
+  worker:
+    tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Equal"
+      value: ""
+      effect: "NoSchedule"
+    - key: "nvidia.com/gpu"
+      operator: "Equal"
+      value: "present"
+      effect: "NoSchedule"
+
+    options:
+      sources:
+        pci:
+          deviceLabelFields:
+          - vendor
+
+platform:
+  openshift: false
+
+operator:
+  repository: nvidia
+  image: gpu-operator
+# If not set, the tag defaults to Chart.AppVersion
+# tag: "foo"
+
+  defaultRuntime: docker
+  clusterversion: 0.0
+
+  nodeSelector: {}
+
+  tolerations:
+  - key: "node-role.kubernetes.io/master"
+    operator: "Equal"
+    value: ""
+    effect: "NoSchedule"
+
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+            matchExpressions:
+              - key: "node-role.kubernetes.io/master"
+                operator: In
+                values: [""]
+
+driver:
+  repository: nvidia
+  image: driver
+  version: "440.64.00"
+
+toolkit:
+  repository: nvidia
+  image: container-toolkit
+  version: 1.0.0-beta.0
+
+devicePlugin:
+  repository: nvidia
+  image: k8s-device-plugin
+  version: 1.0.0-beta4
+
+dcgmExporter:
+  repository: nvidia
+  image: dcgm-exporter
+  version: 1.0.0-beta-ubuntu18.04
+
+dcgmPodExporter:
+  repository: nvidia
+  image: pod-gpu-metrics-exporter
+  version: v1.0.0-alpha
